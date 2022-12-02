@@ -1,4 +1,4 @@
-let { login, addpermission, finduser, updateuser, permission, softdeleteuser, activeuser, userpermission, softundeleteuser, unactiveuser , exporUsert} = require("../controller/admin")
+let {addpermission, finduser, updateuser, permission, softdeleteuser, activeuser, userpermission, softundeleteuser, unactiveuser , exporUsert} = require("../controller/admin")
 let { add_category, update_category,categoryView,delete_category, undelete_category, active_category, unactive_category } = require("../controller/category");
 let { errorhandler } = require("../middleware/errorhandling")
 let { add_product, update_product, find_product,active_product, inactive_product, delete_product, undelete_product, exportProduct } = require("../controller/product")
@@ -10,9 +10,6 @@ require("express-async-errors")
 let app = express();
 
 app.use(cors);
-
-
-app.post("/login", login) //for login of admin
 
 app.get("/getuser", auth("getUser"), finduser) // get the all user
 app.post("/assignpermission", auth("assignpermission"), addpermission) // to give the permission to user

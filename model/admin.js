@@ -8,55 +8,6 @@ const { request, response } = require("express");
 const { param } = require("express/lib/router");
 const { findOne } = require("../schema/user_permission");
 const { QueryTypes } = require("sequelize");
-let excel= require("../helper/excel")
-
-//admin login
-async function checklogin(param) {
-    let schema = joi.object({
-        username: joi.string().max(30).min(3).email().required(),
-        password: joi.string().max(200).min(3).required(),
-    }).options({
-        abortEarly: false
-    });
-
-    let check = schema.validate(param)
-    if (check.error) {
-        let error = [];
-        for (let err of check.error.details) {
-            error.push(err.message)
-        };
-        return { error: error }
-    }
-    return { data: check.value }
-}
-
-async function loginadmin(param) {
-    let check = await checklogin(param).catch((err) => {
-        return { error: err }
-    });
-    if (!check || check.error) {
-        return { error: check.error }
-    }
-    let checkuser = await User.findOne({ where: { username: param.username } }).catch((err) => {
-        return { error: err }
-    })
-    if (!checkuser || checkuser.error) {
-        return { error: "Username Not Found" }
-    }
-
-    let checkpass = await bcrypt.compare(param.password, checkuser.password).catch((err) => {
-        return { error: err }
-    });
-    if (!checkpass || checkpass.error) {
-        return { error: "Username & password Invalid" }
-    }
-    let key = "Mohif9232";
-    let token = jwt.sign({ id: checkuser.id }, key, { expiresIn: "1d" })
-    if (!token || token.error) {
-        return { error: "Internal Server Error" }
-    }
-    return { data: "Login succeefully", token }
-}
 
 
 //get all user
@@ -509,30 +460,6 @@ async function unactive(param,userData) {
     return { data: "Your request succeessfully updated" }
 }
 
-// export userss
 
-async function usersExport(){
-    let find = await User.findAll({raw:true}).catch((err)=>{
-        return { error: err}
-    })
-    if(!find || find.error){
-        return { error: "Internal server Error"}
-    }
-    let columns=[
-        { header: 'id', key: 'id', width: 10 },
-        { header: 'name', key: 'name', width: 10 },
-        { header: 'username', key: 'username', width: 10 },
-        { header: 'phone', key: 'phone', width: 10 },
-                ]
-        
-    let filename= "users";
 
-    await excel(request,response,filename,columns,find).then(()=>{
-        return { data : true}
-    }).catch(()=>{
-        return { error: false}
-    })
-
-}
-
-module.exports = { loginadmin, assignpermission, findall, update, getpermission, getpermission2, softdelete, softundelete, unactive, active }
+module.exports = { assignpermission, findall, update, getpermission, getpermission2, softdelete, softundelete, unactive, active }

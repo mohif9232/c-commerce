@@ -1,17 +1,8 @@
-let {loginadmin, assignpermission,findall,update,getpermission,getpermission2,softdelete,softundelete,unactive,active}= require("../model/admin")
+let { assignpermission,findall,update,getpermission,getpermission2,softdelete,softundelete,unactive,active}= require("../model/admin")
 let {User}= require("../schema/user")
 let excel= require("../helper/excel")
 
-async function login(request,response){
-    let task=await loginadmin(request.body).catch((err)=>{
-        return {error:err}
-    })
-    console.log(task)
-    if(!task || (task && task.error)){
-        return response.status(401).send({error:task.error})
-    }
-    return response.send({data:task})
-}
+
 
 async function addpermission(request,response){
     let task=await assignpermission(request.body,request.userData).catch((err)=>{
@@ -134,4 +125,4 @@ async function exporUsert(request,response){
 
 }
 
-module.exports= {login, addpermission,finduser,updateuser,permission,userpermission, softdeleteuser,softundeleteuser,activeuser,unactiveuser, exporUsert}
+module.exports= { addpermission,finduser,updateuser,permission,userpermission, softdeleteuser,softundeleteuser,activeuser,unactiveuser, exporUsert}
