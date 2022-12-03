@@ -34,7 +34,6 @@ async function add_product(request,response){
     if(!addpic || addpic.error){
         return response.status(401).send({error:addpic.error})
     }
-    console.log(addpic)
     let data=[]
     for(let i of addpic.product){
         data.push(i.path)
@@ -159,3 +158,4 @@ module.exports={
     find_product,
     exportProduct
 }
+

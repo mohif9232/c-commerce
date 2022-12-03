@@ -8,6 +8,7 @@ let randomstring = require("randomstring");
 let { email } = require("../helper/email");
 const { sequelize, QueryTypes } = require("../init/dbconnect");
 const { Product, Op } = require("../schema/product");
+const { query } = require("winston");
 
 
 
@@ -67,7 +68,7 @@ async function registerpatient(param) {
     if (!adduser || adduser.error) {
         return { error: "Internal Server Error" }
     }
-    console.log(adduser)
+    
     let givepermission = await User_permissiion.create({
         user_id: adduser.id,
         permission_id: 9
@@ -679,15 +680,15 @@ async function getpermission2(param) {
 
 async function getpermission(param) {
 
-    let [result] = await User.sequelize.query("SELECT * FROM permission").catch((err) => {
+    let permission = await User.sequelize.query("SELECT * FROM permission",{type:QueryTypes.SELECT}).catch((err) => {
         return { error: err }
     })
-    let permission = result
+   
     if (!permission || permission.error) {
         return { error: permission.error }
 
     }
-    console.log(permission)
+ 
     return { data: permission }
 }
 

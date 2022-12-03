@@ -4,7 +4,7 @@ async function addCart(request,response){
     let add= await cartAdd(request.body,request.userData).catch((err)=>{
         return { error: err}
     })
-    console.log(add)
+   
     if(!add || add.error){
         return response.status(401).send(add.error)
     }
