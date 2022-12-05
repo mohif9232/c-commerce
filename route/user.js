@@ -2,6 +2,7 @@ let {register,login,my_profile_pic,update_profile_pic,forgetpassword,about_me,re
 let { add_category, update_category,categoryView,delete_category, undelete_category, active_category, unactive_category } = require("../controller/category");
 let { errorhandler } = require("../middleware/errorhandling")
 let { add_product, update_product, find_product,active_product, inactive_product, delete_product, undelete_product, exportProduct } = require("../controller/product")
+let { placeOrder, orderView}= require("../controller/order")
 let express = require("express");
 let { addCart,updateCart ,viewCart, removeCart}= require("../controller/cart")
 let cors = require("../init/cors")
@@ -27,6 +28,10 @@ app.post("/add_to_cart",auth("common"),addCart);
 app.get("/view_cart",auth("common"),viewCart);
 app.put("/update_cart",auth("common"),updateCart);
 app.delete("/remove_from_cart",auth("common"),removeCart);
+
+app.post("/place_order",auth("common"),placeOrder)
+app.get("/view_my_order",auth("common"),orderView)
+
 
 
 
@@ -65,7 +70,6 @@ app.put("/update_product", auth("updateproduct"), update_product)// for updating
 app.put("/activate_product", auth("activeproduct"), active_product)  // for unblock product
 app.put("/deactivate_product", auth("activeproduct"), inactive_product) // for block product
 app.delete("/delete_product", auth("deleteproduct"), delete_product) //for delete product
-
 app.delete("/undelete_product", auth("deleteproduct"), undelete_product)// for undelete the product
 
 app.get("/export_user", auth("getUser"), exporUsert) // for get data of user in excel file
@@ -76,4 +80,6 @@ app.get("/export_product", auth("addproduct"), exportProduct) // for get data of
 
 
 app.use(errorhandler)
+
+
 module.exports = app

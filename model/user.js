@@ -242,7 +242,7 @@ async function forget(param) {
     if (!sendmail || sendmail.error) {
         return { error: sendmail }
     }
-    console.log(sendmail)
+
     return { data: sendmail }
 
 }

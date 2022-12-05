@@ -4,6 +4,7 @@ let {Category,Op}= require("../schema/category")
 let Product_category = require("../schema/product_category")
 const { array } = require("joi");
 const { findAll } = require("../schema/product");
+const { where } = require("sequelize");
 
 // for adding product in database
 function productadd(param) {
@@ -315,7 +316,8 @@ async function undeleteproduct(param,userData) {
 function productfind(param) {
     let schema = joi.object({
         product_id: joi.number().max(100).min(0),
-        name: joi.string().max(100).min(0)
+        name: joi.string().max(100).min(0),
+        quantity:joi.number()
 
     }).options({ abortEarly: false })
     let check = schema.validate(param)
@@ -336,17 +338,14 @@ async function findproduct(param) {
     }
     let query = {};
     if (param.product_id) {
-        query = { where: { id: param.product_id } }
+        query = { id: param.product_id } 
     }
     if (param.name) {
-        query = { where: { name: param.name } }
+        query = { name: param.name }
     }
-    let find = await Product.findAll(query).catch((err) => {
+    let find = await Product.findAll({attributes:["id","name","quantity","price","discount","discounted_price","img_path"],where:query,raw:true}).catch((err) => {
         return { error: err }
     })
-    console.log(find[0].img_path)
-    let url= `<a href = ${find[0].img_path}>img</a>`
-    console.log(url)
 
     if (!find || (find && find.error) || find.length == 0) {
         return { error: "product for this id or this name is not available" }

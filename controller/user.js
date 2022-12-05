@@ -73,13 +73,13 @@ async function about_me(request,response){
 }
 
 async function forgetpassword (request,response){
-    let userpass=await forget(request.body).catch((err)=>{
+    let userpass=await forget(request.body,next).catch((err)=>{
         return { error:err }
     })
     if(!userpass || (userpass && userpass.error)){
         return response.status(401).send({ error : userpass.error })
     }
-    return response.send({data:userpass})
+    return response.send({data:userpass});
 }
 
 
