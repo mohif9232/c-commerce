@@ -1,13 +1,14 @@
-let {register,login,my_profile_pic,update_profile_pic,forgetpassword,about_me,resetpassword,changepassword,updatemyprofile,deactivateme,addpermission,finduser,updateuser,permission,userpermission, softdeleteuser,softundeleteuser,activeuser,unactiveuser, exporUsert}= require("../controller/user")
-let { add_category, update_category,categoryView,delete_category, undelete_category, active_category, unactive_category } = require("../controller/category");
+let { register, login, my_profile_pic, update_profile_pic, forgetpassword, about_me, resetpassword, changepassword, updatemyprofile, deactivateme, addpermission, finduser, updateuser, permission, userpermission, softdeleteuser, softundeleteuser, activeuser, unactiveuser, exporUsert } = require("../controller/user")
+let { add_category, update_category, categoryView, delete_category, undelete_category, active_category, unactive_category } = require("../controller/category");
 let { errorhandler } = require("../middleware/errorhandling")
-let { add_product, update_product, find_product,active_product, inactive_product, delete_product, undelete_product, exportProduct } = require("../controller/product")
-let { placeOrder, orderView}= require("../controller/order")
+let { add_product, update_product, find_product, active_product, inactive_product, delete_product, undelete_product, exportProduct } = require("../controller/product")
+let { placeOrder, orderView, orderAllview } = require("../controller/order")
 let express = require("express");
-let { addCart,updateCart ,viewCart, removeCart}= require("../controller/cart")
+let { addCart, updateCart, viewCart, removeCart } = require("../controller/cart")
 let cors = require("../init/cors")
 let { auth } = require("../middleware/authpermission")
-let { authenticate } = require("../middleware/auth")
+let { authenticate } = require("../middleware/auth");
+
 require("express-async-errors")
 let app = express();
 
@@ -16,32 +17,32 @@ app.use(cors);
 app.post("/login", login) //for login of admin
 app.post("/register", register) //for login of admin
 
-app.get("/about_me",auth("common"),about_me);
-app.post("/my_profile_pic",auth("common"),my_profile_pic);
-app.put("/update_my_profile_pic",auth("common"),update_profile_pic);
+app.get("/about_me", auth("common"), about_me);
+app.post("/my_profile_pic", auth("common"), my_profile_pic);
+app.put("/update_my_profile_pic", auth("common"), update_profile_pic);
 
-app.get("/view_product",find_product)
-app.get("/view_category",categoryView)
-
-
-app.post("/add_to_cart",auth("common"),addCart);
-app.get("/view_cart",auth("common"),viewCart);
-app.put("/update_cart",auth("common"),updateCart);
-app.delete("/remove_from_cart",auth("common"),removeCart);
-
-app.post("/place_order",auth("common"),placeOrder)
-app.get("/view_my_order",auth("common"),orderView)
+app.get("/view_product", find_product)
+app.get("/view_category", categoryView)
 
 
+app.post("/add_to_cart", auth("common"), addCart);
+app.get("/view_cart", auth("common"), viewCart);
+app.put("/update_cart", auth("common"), updateCart);
+app.delete("/remove_from_cart", auth("common"), removeCart);
+
+app.post("/place_order", auth("common"), placeOrder)
+app.get("/view_my_order", auth("common"), orderView)
 
 
-app.post("/change_password",auth("common"),changepassword);
-app.post("/update_profile",auth("common"),updatemyprofile)
 
-app.post("/forget_password",forgetpassword);
-app.put("/reset_password",resetpassword);
 
-app.put("/deactivate_account",auth("common"),deactivateme);
+app.post("/change_password", auth("common"), changepassword);
+app.post("/update_profile", auth("common"), updatemyprofile)
+
+app.post("/forget_password", forgetpassword);
+app.put("/reset_password", resetpassword);
+
+app.put("/deactivate_account", auth("common"), deactivateme);
 
 app.get("/getuser", auth("getUser"), finduser) // get the all user
 app.post("/assignpermission", auth("assignpermission"), addpermission) // to give the permission to user
@@ -63,14 +64,16 @@ app.delete("/activate_category", auth("deleteproduct"), active_category)// unblo
 app.delete("/deactivate_category", auth("deleteproduct"), unactive_category)// block category
 
 app.post("/add_product", auth("addproduct"), add_product) // for adding product
-app.get("/view_product",find_product)
-app.get("/view_category",categoryView)
+app.get("/view_product", find_product)
+app.get("/view_category", categoryView)
 
 app.put("/update_product", auth("updateproduct"), update_product)// for updating product
 app.put("/activate_product", auth("activeproduct"), active_product)  // for unblock product
 app.put("/deactivate_product", auth("activeproduct"), inactive_product) // for block product
 app.delete("/delete_product", auth("deleteproduct"), delete_product) //for delete product
 app.delete("/undelete_product", auth("deleteproduct"), undelete_product)// for undelete the product
+
+app.get("/view_all_order", auth("viewOrder"), orderAllview)
 
 app.get("/export_user", auth("getUser"), exporUsert) // for get data of user in excel file
 app.get("/export_product", auth("addproduct"), exportProduct) // for get data of product in excel file

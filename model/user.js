@@ -1,5 +1,4 @@
 let { User } = require("../schema/user")
-let User_permissiion = require("../schema/user_permission")
 let joi = require("joi");
 let bcrypt = require("bcrypt");
 let jwt = require("jsonwebtoken");
@@ -8,6 +7,8 @@ let randomstring = require("randomstring");
 let { email } = require("../helper/email");
 const { sequelize, QueryTypes } = require("../init/dbconnect");
 const { Product, Op } = require("../schema/product");
+let Permission = require("../schema/permission")
+let { User_permissiion } = require("../schema/user_permission")
 const { query } = require("winston");
 
 
@@ -18,7 +19,7 @@ const { query } = require("winston");
 async function checkregister(param) {
     let schema = joi.object({
         name: joi.string().max(30).min(3).required(),
-        username: joi.string().max(30).min(3).required(),
+        username: joi.string().email({ tlds: { allow: ['com', 'net', 'in'] } }).max(30).min(3).required(),
         password: joi.string().max(200).min(3).required(),
         mobile_no: joi.string().max(30).min(4).required()
     }).options({
@@ -58,9 +59,7 @@ async function registerpatient(param) {
         name: param.name,
         username: param.username,
         password: param.password,
-        mobile_no: param.mobile_no,
-        is_deleted: false,
-        is_active: true
+        mobile_no: param.mobile_no
     }).catch((err) => {
         return { error: err }
     })
@@ -68,7 +67,7 @@ async function registerpatient(param) {
     if (!adduser || adduser.error) {
         return { error: "Internal Server Error" }
     }
-    
+
     let givepermission = await User_permissiion.create({
         user_id: adduser.id,
         permission_id: 9
@@ -78,7 +77,7 @@ async function registerpatient(param) {
     if (!givepermission || givepermission.error) {
         return { error: givepermission.error }
     }
-    return { data: "registered Successfully", adduser }
+    return { data: "registered Successfully" }
 }
 
 //for login of user
@@ -504,7 +503,7 @@ async function findall(param) {
         return { error: err }
     })
     console.log(alluser)
-    if (!alluser || (alluser && alluser.error) || alluser.length==0) {
+    if (!alluser || (alluser && alluser.error) || alluser.length == 0) {
         return { error: "Cant find user" }
     }
     return { data: alluser }
@@ -532,7 +531,7 @@ async function check(param) {
     return { data: check.value }
 }
 
-async function assignpermission(param,userData) {
+async function assignpermission(param, userData) {
     let checkbody = await check(param).catch((err) => {
         return { error: err }
     })
@@ -542,25 +541,27 @@ async function assignpermission(param,userData) {
     let user = await User.findOne({ where: { id: param.user_id } }).catch((err) => {
         return { error: err }
     });
-    
+
     if (!user || (user && user.error)) {
         return { error: " ID not Matched" }
     }
 
-    let checkper = await Permission.findAll({where:{
-        id:{[Op.in]:param.permission}
-    }}).catch((err)=>{
-        return { error: err}
+    let checkper = await Permission.findAll({
+        where: {
+            id: { [Op.in]: param.permission }
+        }
+    }).catch((err) => {
+        return { error: err }
     })
-    if ( !checkper || checkper.error){
-        return { error: checkper.error}
+    if (!checkper || checkper.error) {
+        return { error: checkper.error }
     }
-    if(checkper.length != param.permission.length){
-        return { error: "Invalid Permissions"}
+    if (checkper.length != param.permission.length) {
+        return { error: "Invalid Permissions" }
     }
     let pers = [];
     for (let i of param.permission) {
-        pers.push({ user_id: user.id, permission_id: i , createdBy:userData.id})
+        pers.push({ user_id: user.id, permission_id: i, createdBy: userData.id })
     }
     console.log(pers)
     let perData = await User_permissiion.bulkCreate(pers).catch((err) => {
@@ -598,7 +599,7 @@ async function checkupdate(param) {
     return { data: check.value }
 }
 
-async function update(param,userData) {
+async function update(param, userData) {
     let check = await checkupdate(param).catch((err) => {
         return { error: err }
     });
@@ -615,7 +616,7 @@ async function update(param,userData) {
         name: param.name,
         username: param.username,
         mobile_no: param.mobile_no,
-        updatedBy:userData.id
+        updatedBy: userData.id
     }, { where: { id: finduser.id } }).catch((err) => {
         return { error: err }
     });
@@ -680,15 +681,15 @@ async function getpermission2(param) {
 
 async function getpermission(param) {
 
-    let permission = await User.sequelize.query("SELECT * FROM permission",{type:QueryTypes.SELECT}).catch((err) => {
+    let permission = await User.sequelize.query("SELECT * FROM permission", { type: QueryTypes.SELECT }).catch((err) => {
         return { error: err }
     })
-   
+
     if (!permission || permission.error) {
         return { error: permission.error }
 
     }
- 
+
     return { data: permission }
 }
 
@@ -714,7 +715,7 @@ async function checkdelete(param) {
 
 
 
-async function softdelete(param,userData) {
+async function softdelete(param, userData) {
     let check = await checkdelete(param).catch((err) => {
         return { error: err }
     })
@@ -725,7 +726,7 @@ async function softdelete(param,userData) {
     let finduser = await User.findOne({
         where: {
             id: param.user_id,
-            name:param.name
+            name: param.name
         }
     }).catch((err) => {
         return { error: err }
@@ -733,7 +734,7 @@ async function softdelete(param,userData) {
     if (!finduser || (finduser && finduser.error)) {
         return { error: "Id and Name not matched" }
     }
-    let update = await User.update({ is_deleted: true , is_active:false, updatedBy:userData.id}, {
+    let update = await User.update({ is_deleted: true, is_active: false, updatedBy: userData.id }, {
         where: {
             id: finduser.id
         }
@@ -769,7 +770,7 @@ async function checkundelete(param) {
 }
 
 
-async function softundelete(param,userData) {
+async function softundelete(param, userData) {
     let check = await checkundelete(param).catch((err) => {
         return { error: err }
     })
@@ -780,7 +781,7 @@ async function softundelete(param,userData) {
     let finduser = await User.findOne({
         where: {
             id: param.user_id,
-            name:param.name
+            name: param.name
         }
     }).catch((err) => {
         return { error: err }
@@ -788,7 +789,7 @@ async function softundelete(param,userData) {
     if (!finduser || (finduser && finduser.error)) {
         return { error: "Id and Name not matched" }
     }
-    let update = await User.update({ is_deleted: false , is_active:true, updatedBy:userData.id}, {
+    let update = await User.update({ is_deleted: false, is_active: true, updatedBy: userData.id }, {
         where: {
             id: finduser.id
         }
@@ -824,7 +825,7 @@ async function checkactive(param) {
 }
 
 
-async function active(param,userData) {
+async function active(param, userData) {
     let check = await checkactive(param).catch((err) => {
         return { error: err }
     })
@@ -835,7 +836,7 @@ async function active(param,userData) {
     let finduser = await User.findOne({
         where: {
             id: param.user_id,
-            name:param.name
+            name: param.name
         }
     }).catch((err) => {
         return { error: err }
@@ -843,7 +844,7 @@ async function active(param,userData) {
     if (!finduser || (finduser && finduser.error)) {
         return { error: "Id and Name not matched" }
     }
-    let update = await User.update({ is_active: true , updatedBy:userData.id}, {
+    let update = await User.update({ is_active: true, updatedBy: userData.id }, {
         where: {
             id: finduser.id,
         }
@@ -878,7 +879,7 @@ async function checkunactive(param) {
 }
 
 
-async function unactive(param,userData) {
+async function unactive(param, userData) {
     let check = await checkunactive(param).catch((err) => {
         return { error: err }
     })
@@ -889,7 +890,7 @@ async function unactive(param,userData) {
     let finduser = await User.findOne({
         where: {
             id: param.user_id,
-            name:param.name
+            name: param.name
         }
     }).catch((err) => {
         return { error: err }
@@ -897,7 +898,7 @@ async function unactive(param,userData) {
     if (!finduser || (finduser && finduser.error)) {
         return { error: "Id and Name not matched" }
     }
-    let update = await User.update({ is_active: false , updatedBy:userData.id}, {
+    let update = await User.update({ is_active: false, updatedBy: userData.id }, {
         where: {
             id: finduser.id,
         }
@@ -927,12 +928,12 @@ module.exports = {
     updateprofile,
     deactivate,
     assignpermission,
-     findall,
-      update,
-       getpermission,
-        getpermission2,
-         softdelete,
-          softundelete,
-           unactive, 
-           active
+    findall,
+    update,
+    getpermission,
+    getpermission2,
+    softdelete,
+    softundelete,
+    unactive,
+    active
 }

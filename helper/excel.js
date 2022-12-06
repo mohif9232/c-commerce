@@ -39,6 +39,7 @@ async function excel(request, response, filename, columns, userData) {
     response.setHeader("Content-Disposition", `attachment; filename=${filename}.xlsx`)
 
     await workbook.xlsx.writeBuffer(`${filename}.xlsx`).then((data) => {
+        console.log(data)
         return response.status(200).send(true)
     }).catch((err) => {
         return response.status(500).send(false)
