@@ -2,7 +2,7 @@ let { register, login, my_profile_pic, update_profile_pic, forgetpassword, about
 let { add_category, update_category, categoryView, delete_category, undelete_category, active_category, unactive_category } = require("../controller/category");
 let { errorhandler } = require("../middleware/errorhandling")
 let { add_product, update_product, find_product, active_product, inactive_product, delete_product, undelete_product, exportProduct } = require("../controller/product")
-let { placeOrder, orderView, orderAllview } = require("../controller/order")
+let { placeOrder, orderView, orderAllview, payment, confirmOrder, cancelOrder, cancelOrderAdmin, delivery_status } = require("../controller/order")
 let express = require("express");
 let { addCart, updateCart, viewCart, removeCart } = require("../controller/cart")
 let cors = require("../init/cors")
@@ -32,9 +32,12 @@ app.delete("/remove_from_cart", auth("common"), removeCart);
 
 app.post("/place_order", auth("common"), placeOrder)
 app.get("/view_my_order", auth("common"), orderView)
+app.post("/payment", auth("common"), payment);
 
-
-
+app.post("/confirm_order", auth("confirmOrder"), confirmOrder)
+app.post("/cancel_my_order", auth("common"), cancelOrder)
+app.post("/cancel_user_order", auth("cancelOrder"), cancelOrderAdmin)
+app.post("/delivery_status", auth("makeDelivery"), delivery_status)
 
 app.post("/change_password", auth("common"), changepassword);
 app.post("/update_profile", auth("common"), updatemyprofile)
