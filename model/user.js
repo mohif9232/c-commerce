@@ -10,6 +10,7 @@ const { Product, Op } = require("../schema/product");
 let Permission = require("../schema/permission")
 let { User_permissiion } = require("../schema/user_permission")
 const { query } = require("winston");
+let { secretKey } = require("../config/constant")
 
 
 
@@ -135,8 +136,8 @@ async function loginpatient(param) {
     if (!checkpass || checkpass.error) {
         return { error: "Username & password Invalid" }
     }
-    let key = "Mohif9232";
-    let token = jwt.sign({ id: checkpatient.id }, key, { expiresIn: "1d" })
+
+    let token = jwt.sign({ id: checkpatient.id }, secretKey, { expiresIn: "1d" })
     if (!token || token.error) {
         return { error: "Internal Server Error" }
     }

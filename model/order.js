@@ -105,6 +105,7 @@ async function viewALLorder(param) {
     }).catch((err) => {
         return { error: err }
     })
+
     for (let a of search) {
         a.order_status = (a.order_status == 0) ? "pending" : (a.order_status == 1) ? "Order Placed but payment is not done " : (a.order_status == 2) ? "order placed and payment successfull" : (a.order_status == 3) ? "Cancelled by you" : (a.order_status == 4) ? "Cancelled by Admin " : (a.order_status == 5) ? "cancel order payment fail" : (a.order_status == 6) ? " Order Confirmed" : (a.order_status == 7) ? "Order Cancelled Delivery Failed" : "Not available";
 
