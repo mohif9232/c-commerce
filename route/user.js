@@ -1,4 +1,4 @@
-let { register, login, my_profile_pic, update_profile_pic, forgetpassword, about_me, resetpassword, changepassword, updatemyprofile, deactivateme, addpermission, finduser, updateuser, permission, userpermission, softdeleteuser, softundeleteuser, activeuser, unactiveuser, exporUsert } = require("../controller/user")
+let { register, login, my_profile_pic, update_profile_pic, forgetpassword, about_me, resetpassword, changepassword, updatemyprofile, deactivateme, activateme, addpermission, finduser, updateuser, permission, userpermission, softdeleteuser, softundeleteuser, activeuser, unactiveuser, exporUsert } = require("../controller/user")
 let { add_category, update_category, categoryView, delete_category, undelete_category, active_category, unactive_category } = require("../controller/category");
 let { errorhandler } = require("../middleware/errorhandling")
 let { add_product, update_product, find_product, active_product, inactive_product, delete_product, undelete_product, exportProduct } = require("../controller/product")
@@ -45,7 +45,9 @@ app.post("/update_profile", auth("common"), updatemyprofile)
 app.post("/forget_password", forgetpassword);
 app.put("/reset_password", resetpassword);
 
-app.put("/deactivate_account", auth("common"), deactivateme);
+app.delete("/deactivate_account", auth("common"), deactivateme);
+app.put("/activate_account", activateme);
+
 
 app.get("/getuser", auth("getUser"), finduser) // get the all user
 app.post("/assignpermission", auth("assignpermission"), addpermission) // to give the permission to user
