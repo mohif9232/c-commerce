@@ -23,6 +23,7 @@ async function checkregister(param) {
         name: joi.string().max(30).min(3).required(),
         username: joi.string().email({ tlds: { allow: ['com', 'net', 'in'] } }).max(30).min(3).required(),
         password: joi.string().max(200).min(3).required(),
+        confirm_password: joi.any().valid(joi.ref("password")).required(),
         mobile_no: joi.string().max(30).min(4).required()
     }).options({
         abortEarly: false
@@ -176,7 +177,7 @@ async function updateProfile(imagePath, loginUser) {
 
 //for get me
 
-async function getme(param, userData) {
+async function getme(userData) {
 
     let findme = await User.findOne({ attributes: ["name", "username", "mobile_no", "profile_pic_path"], where: { id: userData.id } }).catch((err) => {
         return { error: err }
@@ -393,8 +394,7 @@ async function updateprofile(param, userData) {
     if (!updatename || (updatename && updatename.error)) {
         return { error: "Internal Server Error" }
     }
-    console.log(updatename)
-    return { data: " Your Profile Updated Successfully", updatename }
+    return { data: " Your Profile Updated Successfully" }
 }
 
 
@@ -422,7 +422,7 @@ async function checkupdate(param) {
 //deactivate me
 
 
-async function deactivate(param, userData) {
+async function deactivate(userData) {
     let finduser = await User.findOne({ where: { id: userData.id } }).catch((err) => {   //id ke jagah token baadme
         return { error: err }
     });
@@ -432,7 +432,6 @@ async function deactivate(param, userData) {
     let update = await User.update({ is_deletedBy_user: true }, { where: { id: finduser.id } }).catch((err) => {
         return { error: err }
     });
-    console.log(update)
     if (!update || update.error) {
         return { error: "Internal Server Error" }
     }
@@ -484,24 +483,7 @@ async function activate(param) {
 }
 
 
-//search 
-async function searchJoi(param) {
-    let schema = joi.object({
-        search: joi.required()
-    }).options({
-        abortEarly: false
-    });
-
-    let check = schema.validate(param)
-    if (check.error) {
-        let error = [];
-        for (let err of check.error.details) {
-            error.push(err.message)
-        }
-        return { error: check.error }
-    }
-    return { data: check.value }
-}
+/* for admin */
 
 //get all user
 async function checkbody(param) {
@@ -523,6 +505,7 @@ async function checkbody(param) {
     }
     return { data: check.value }
 }
+
 async function findall(param) {
     let check = await checkbody(param).catch((err) => {
         return { error: err }
@@ -544,7 +527,7 @@ async function findall(param) {
     let alluser = await User.findAll(query).catch((err) => {
         return { error: err }
     })
-    console.log(alluser)
+
     if (!alluser || (alluser && alluser.error) || alluser.length == 0) {
         return { error: "Cant find user" }
     }
@@ -605,11 +588,9 @@ async function assignpermission(param, userData) {
     for (let i of param.permission) {
         pers.push({ user_id: user.id, permission_id: i, createdBy: userData.id })
     }
-    console.log(pers)
     let perData = await User_permissiion.bulkCreate(pers).catch((err) => {
         return { error: err }
     });
-    console.log(perData)
     if (!perData || (perData && perData.error)) {
         return { error: "Internal Server Error" }
     }
@@ -956,9 +937,6 @@ async function unactive(param, userData) {
 
     return { data: "Your request succeessfully updated" }
 }
-
-
-
 
 module.exports = {
     registerpatient,

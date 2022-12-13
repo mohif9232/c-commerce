@@ -165,7 +165,6 @@ async function pay(param, userData) {
     }).catch((err) => {
         return { error: err }
     })
-    console.log(validate)
     if (!validate || validate.error) {
         await Order.update({ order_status: 5, payment_status: 2 }, { where: { id: param.order_id, user_id: userData.id } }).catch((err) => {
             console.log(err)

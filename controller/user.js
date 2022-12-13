@@ -63,7 +63,7 @@ async function update_profile_pic(request, response) {
 
 
 async function about_me(request, response) {
-    let get = await getme(request.body, request.userData).catch((err) => {
+    let get = await getme(request.userData).catch((err) => {
         return { error: err }
     })
     if (!get || get.error) {
@@ -118,7 +118,7 @@ async function updatemyprofile(request, response) {
 }
 
 async function deactivateme(request, response) {
-    let check = await deactivate(request.body, request.userData).catch((err) => {
+    let check = await deactivate(request.userData).catch((err) => {
         return { error: err }
     });
 
@@ -190,8 +190,7 @@ async function userpermission(request, response) {
     let task = await getpermission2(request.body).catch((err) => {
         return { error: err }
     })
-    console.log(task)
-    console.log(task)
+
     if (!task || (task && task.error)) {
         return response.status(401).send({ error: task.error })
     }
@@ -231,7 +230,6 @@ async function unactiveuser(request, response) {
     let done = await unactive(request.body, request.userData).catch((err) => {
         return { error: err }
     })
-    console.log(done)
     if (!done || done.error) {
         return response.status(401).send({ error: done.error })
     };

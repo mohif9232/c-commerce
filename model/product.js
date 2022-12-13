@@ -39,7 +39,6 @@ async function addproduct(param, imagePath, loginUser) {
     if (findproduct) {
         return { error: "This Product is already existed" }
     }
-    console.log(param)
     let category = param.category;
     delete param.category;
 
@@ -343,9 +342,12 @@ async function findproduct(param) {
     if (param.name) {
         query = { name: param.name }
     }
-    let find = await Product.findAll({ attributes: ["id", "name", "quantity", "price", "discount", "discounted_price", "img_path"], where: query, raw: true }).catch((err) => {
+    let find = await Product.findAll({ attributes: ["id", "name", "quantity", "price", "discount", "discounted_price", "img_path", "is_active"], where: query, raw: true }).catch((err) => {
         return { error: err }
     })
+    for (let a of find) {
+        a.is_active = a.is_active == 1 ? "Available to order" : "not availabe"
+    }
 
     if (!find || (find && find.error) || find.length == 0) {
         return { error: "product for this id or this name is not available" }
