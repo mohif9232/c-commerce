@@ -28,9 +28,7 @@ async function orderPlace(param, productData, userData) {
     if (!check || check.error) {
         return { error: check.error }
     }
-    if (productData.quantity == 0 || param.quantity > productData.quantity) {
-        return { error: "This product is out of stock Please try again later" }
-    }
+
     let order = await Order.create({
         user_id: userData.id,
         product_id: productData.id,

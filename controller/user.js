@@ -110,11 +110,10 @@ async function updatemyprofile(request, response) {
     let check = await updateprofile(request.body, request.userData).catch((err) => {
         return { error: err }
     })
-    console.log(check)
     if (!check || check.error) {
         return response.status(402).send({ error: check.error })
     }
-    return response.send({ data: check })
+    return response.status(200).send({ data: check.data })
 }
 
 async function deactivateme(request, response) {

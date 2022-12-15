@@ -335,18 +335,18 @@ async function findproduct(param) {
     if (!check || check.error) {
         return { error: check.error }
     }
-    let query = {};
+    let query = { is_deleted: { [Op.ne]: 1 } };
     if (param.product_id) {
-        query = { id: param.product_id }
+        query = { id: param.product_id, is_deleted: { [Op.ne]: 1 } }
     }
     if (param.name) {
-        query = { name: param.name }
+        query = { name: param.name, is_deleted: { [Op.ne]: 1 } }
     }
     let find = await Product.findAll({ attributes: ["id", "name", "quantity", "price", "discount", "discounted_price", "img_path", "is_active"], where: query, raw: true }).catch((err) => {
         return { error: err }
     })
     for (let a of find) {
-        a.is_active = a.is_active == 1 ? "Available to order" : "not availabe"
+        a.is_active = a.is_active == 1 ? "Available to order" : "not available";
     }
 
     if (!find || (find && find.error) || find.length == 0) {

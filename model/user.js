@@ -139,6 +139,7 @@ async function loginpatient(param) {
     }
     return { data: "Login succeefully", token }
 }
+
 //for adding profile pic
 
 async function addprofile(imagePath, loginUser) {
