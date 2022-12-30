@@ -1,3 +1,4 @@
+const { logger } = require("../init/winston");
 let { category, updatecat, viewCategory, softdeletecat, softundeletecat, activecat, unactivecat } = require("../model/category")
 
 

@@ -8,7 +8,7 @@ async function placeOrder(request, response) {
     if (!data || data.error) {
         return response.status(500).send({ error: data.error })
     }
-    if (data.data[0] == 0 || request.body.quantity > data.data[0].quantity) {
+    if (data.data[0].quantity == 0 || request.body.quantity > data.data[0].quantity) {
         return response.status(500).send({ error: "This product is out of stock Please try again later" })
     }
     if (data.data[0].is_active == "not available") {
