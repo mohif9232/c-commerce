@@ -29,7 +29,7 @@ function productadd(param) {
 }
 
 async function addproduct(param, imagePath, loginUser) {
-    let check = await productadd(param);
+    let check = productadd(param);
     if (check.error) {
         return { error: check.error }
     }
@@ -92,7 +92,7 @@ async function addproduct(param, imagePath, loginUser) {
 // for updating product 
 
 
-function productupdate(param) {
+async function productupdate(param) {
     let schema = joi.object({
 
         product_id: joi.number().max(100).min(0).required(),
